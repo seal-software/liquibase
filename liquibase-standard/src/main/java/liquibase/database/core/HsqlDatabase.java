@@ -519,4 +519,10 @@ public class HsqlDatabase extends AbstractJdbcDatabase {
         final String clause = super.getAutoIncrementClause(startWith, incrementBy, generationType, defaultOnNull);
         return clause.replace(",", ""); //sql doesn't use commas between the values
     }
+
+    @Override
+    public boolean failOnDeferrable() {
+        return false;
+    }
+
 }
