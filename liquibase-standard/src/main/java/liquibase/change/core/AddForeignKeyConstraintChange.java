@@ -278,12 +278,12 @@ public class AddForeignKeyConstraintChange extends AbstractChange {
     public SqlStatement[] generateStatements(Database database) {
 
         boolean deferrable = false;
-        if (getDeferrable() != null) {
+        if (checkDeferrable(database) && getDeferrable() != null) {
             deferrable = getDeferrable();
         }
 
         boolean initiallyDeferred = false;
-        if (getInitiallyDeferred() != null) {
+        if (checkDeferrable(database) && getInitiallyDeferred() != null) {
             initiallyDeferred = getInitiallyDeferred();
         }
 
@@ -308,6 +308,10 @@ public class AddForeignKeyConstraintChange extends AbstractChange {
                         .setOnDelete(getOnDelete())
                         .setShouldValidate(shouldValidate)
         };
+    }
+
+    private boolean checkDeferrable(Database database) {
+        return database.supportsInitiallyDeferrableColumns() || database.failOnDeferrable();
     }
 
     @Override
