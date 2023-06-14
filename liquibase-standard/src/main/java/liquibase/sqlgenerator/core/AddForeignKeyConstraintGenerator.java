@@ -24,8 +24,14 @@ public class AddForeignKeyConstraintGenerator extends AbstractSqlGenerator<AddFo
         ValidationErrors validationErrors = new ValidationErrors();
 
         if ((addForeignKeyConstraintStatement.isInitiallyDeferred() || addForeignKeyConstraintStatement.isDeferrable()) && !database.supportsInitiallyDeferrableColumns()) {
-            validationErrors.checkDisallowedField("initiallyDeferred", addForeignKeyConstraintStatement.isInitiallyDeferred(), database);
-            validationErrors.checkDisallowedField("deferrable", addForeignKeyConstraintStatement.isDeferrable(), database);
+            if (database.failOnDeferrable()) {
+                validationErrors.checkDisallowedField("initiallyDeferred", addForeignKeyConstraintStatement.isInitiallyDeferred(), database);
+                validationErrors.checkDisallowedField("deferrable", addForeignKeyConstraintStatement.isDeferrable(), database);
+            } else {
+                // reset this as it's not supported
+                addForeignKeyConstraintStatement.setDeferrable(false);
+                addForeignKeyConstraintStatement.setInitiallyDeferred(false);
+            }
         }
 
         validationErrors.checkRequiredField("baseColumnNames", addForeignKeyConstraintStatement.getBaseColumnNames());
